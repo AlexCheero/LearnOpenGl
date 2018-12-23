@@ -4,6 +4,7 @@
 
 class Shader
 {
+	static const int logLength = 512;
 	GLuint _shaderProgram;
 
 	GLuint CreateShaderObjectFromFile(const GLchar* filePath, GLenum type);
