@@ -137,9 +137,6 @@
     <ClInclude Include="data.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\sunset-in-the-city-background_1092-42.jpg" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
