@@ -55,7 +55,7 @@ void Unbind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-unsigned int PrepareData(std::vector<float> vertices, std::vector<unsigned int> indices = {})
+unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int> indices = {})
 {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -64,8 +64,8 @@ unsigned int PrepareData(std::vector<float> vertices, std::vector<unsigned int> 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	GLsizeiptr vertsSize = sizeof(*vertices.data()) * vertices.size();
-	glBufferData(GL_ARRAY_BUFFER, vertsSize, vertices.data(), GL_STATIC_DRAW);
+	GLsizeiptr vertsSize = sizeof(*vertexData.data()) * vertexData.size();
+	glBufferData(GL_ARRAY_BUFFER, vertsSize, vertexData.data(), GL_STATIC_DRAW);
 
 	if (indices.size() > 0)
 	{
@@ -76,8 +76,11 @@ unsigned int PrepareData(std::vector<float> vertices, std::vector<unsigned int> 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indices.data(), GL_STATIC_DRAW);
 	}
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	Unbind();
 
@@ -108,10 +111,11 @@ int main(int argc, char *argv[])
 
 	unsigned int VAO = PrepareData(
 		{
-			 0.5f, 0.5f, 0.0f,  // top right
-			 0.5f, -0.5f, 0.0f,  // bottom right
-			-0.5f, -0.5f, 0.0f,  // bottom left
-			-0.5f, 0.5f, 0.0f   // top left
+			 //vert				//color
+			 0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // top right
+			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+			-0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 0.0f // top left
 		},
 		{  // note that we start from 0!
 			0, 1, 3,   // first triangle
@@ -120,6 +124,7 @@ int main(int argc, char *argv[])
 
 	glBindVertexArray(VAO);
 	shader.Use();
+	int vertexColorLocation = shader.GetUniformLocation("ourColor");
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -128,6 +133,10 @@ int main(int argc, char *argv[])
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

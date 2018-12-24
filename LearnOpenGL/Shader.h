@@ -15,5 +15,6 @@ class Shader
 public:
 	Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
 	void Use() const { glUseProgram(_shaderProgram); }
+	int GetUniformLocation (const char* name) { return glGetUniformLocation(_shaderProgram, name); }
 };
 
