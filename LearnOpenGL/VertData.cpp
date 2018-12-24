@@ -1,6 +1,6 @@
-#include "data.h"
+#include "VertData.h"
 
-data::data()
+VertData::VertData()
 {
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -21,7 +21,7 @@ data::data()
 	Unbind();
 }
 
-void data::Unbind()
+void VertData::Unbind()
 {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

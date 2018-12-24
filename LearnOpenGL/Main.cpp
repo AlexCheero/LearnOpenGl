@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "Shader.h"
-#include "data.h"
+#include "VertData.h"
 
 struct Color
 {
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
 
-	data dt;
+	VertData data;
 	Shader shader(exeRoot + "Shaders\\DefaultVertexShader.glsl", exeRoot + "Shaders\\DefaultFragmentShader.glsl");
 
-	dt.Bind();
+	data.Bind();
 	shader.Use();
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

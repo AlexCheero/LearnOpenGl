@@ -1,7 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 
-class data
+class VertData
 {
 	float vertices[12] =
 	{
@@ -20,7 +20,7 @@ class data
 	unsigned int VAO;
 
 public:
-	data();
+	VertData();
 	void Bind() { glBindVertexArray(VAO); }
 	void Unbind();
 };
