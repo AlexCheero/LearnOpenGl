@@ -56,7 +56,7 @@ GLuint Shader::CreateShaderObjectFromSource(GLenum type, const GLchar* shaderSou
 
 void Shader::LogShaderCompilationError(GLenum type, GLuint shader) const
 {
-	char* shaderType;
+	const char* shaderType;
 	switch (type)
 	{
 	case GL_VERTEX_SHADER:
