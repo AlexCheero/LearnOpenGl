@@ -1,9 +1,10 @@
+#include <iostream>
+#include <vector>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <iostream>
 #include "Shader.h"
-#include "VertData.h"
 
 struct Color
 {
@@ -47,6 +48,42 @@ void ProcessInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+void Unbind()
+{
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+unsigned int PrepareData(std::vector<float> vertices, std::vector<unsigned int> indices = {})
+{
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	GLsizeiptr vertsSize = sizeof(*vertices.data()) * vertices.size();
+	glBufferData(GL_ARRAY_BUFFER, vertsSize, vertices.data(), GL_STATIC_DRAW);
+
+	if (indices.size() > 0)
+	{
+		unsigned int EBO;
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		GLsizeiptr indSize = sizeof(*indices.data()) * indices.size();
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indices.data(), GL_STATIC_DRAW);
+	}
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	Unbind();
+
+	return VAO;
+}
+
 int main(int argc, char *argv[])
 {
 	std::string exePath = std::string(argv[0]);
@@ -67,10 +104,21 @@ int main(int argc, char *argv[])
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
 
-	VertData data;
 	Shader shader(exeRoot + "Shaders\\DefaultVertexShader.glsl", exeRoot + "Shaders\\DefaultFragmentShader.glsl");
 
-	data.Bind();
+	unsigned int VAO = PrepareData(
+		{
+			 0.5f, 0.5f, 0.0f,  // top right
+			 0.5f, -0.5f, 0.0f,  // bottom right
+			-0.5f, -0.5f, 0.0f,  // bottom left
+			-0.5f, 0.5f, 0.0f   // top left
+		},
+		{  // note that we start from 0!
+			0, 1, 3,   // first triangle
+			1, 2, 3    // second triangle
+		});
+
+	glBindVertexArray(VAO);
 	shader.Use();
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -80,7 +128,8 @@ int main(int argc, char *argv[])
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
