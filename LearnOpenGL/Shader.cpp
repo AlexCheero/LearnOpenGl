@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "Log.h"
+
 Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath)
 {
 	GLuint vertexShader = CreateShaderObjectFromFile(vertexSourcePath.c_str(), GL_VERTEX_SHADER);
@@ -27,7 +29,7 @@ void Shader::CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader)
 	if (!success)
 	{
 		glGetProgramInfoLog(_shaderProgram, logLength, nullptr, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		Log() << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << '\n';
 	}
 }
 
@@ -73,5 +75,5 @@ void Shader::LogShaderCompilationError(GLenum type, GLuint shader) const
 	}
 	GLchar infoLog[logLength];
 	glGetShaderInfoLog(shader, logLength, nullptr, infoLog);
-	std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+	Log() << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << '\n';
 }

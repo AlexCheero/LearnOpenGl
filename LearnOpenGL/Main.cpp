@@ -4,8 +4,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Shader.h"
 #include "stb_image.h"
+
+#include "Shader.h"
+#include "Log.h"
 
 struct Color
 {
@@ -32,7 +34,7 @@ GLFWwindow* InitWindow(int width, int height, const char* caption)
 	GLFWwindow* window = glfwCreateWindow(width, height, caption, nullptr, nullptr);
 	if (window == nullptr)
 	{
-		std::cout << "Failed to create GLFW window" << std::endl;
+		Log() << "Failed to create GLFW window" << '\n';
 		glfwTerminate();
 		return nullptr;
 	}
@@ -103,7 +105,7 @@ bool Init(char* path)
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		Log() << "Failed to initialize GLAD" << '\n';
 		return false;
 	}
 
@@ -148,7 +150,7 @@ int main(int argc, char *argv[])
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
-		std::cout << "Failed to load texture" << std::endl;
+		Log() << "Failed to load texture" << '\n';
 
 	stbi_image_free(data);
 	//--------------------------------------------------------
