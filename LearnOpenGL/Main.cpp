@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Shader.h"
+#include "stb_image.h"
 
 struct Color
 {
@@ -14,6 +15,9 @@ struct Color
 int ViewportWidth = 800;
 int ViewportHeight = 600;
 Color ClearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
+std::string exePath;
+std::string exeRoot;
+GLFWwindow* window;
 
 void InitGLFW()
 {
@@ -87,44 +91,72 @@ unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int
 	return VAO;
 }
 
-int main(int argc, char *argv[])
+bool Init(char* path)
 {
-	std::string exePath = std::string(argv[0]);
-	std::string exeRoot = exePath.substr(0, exePath.rfind('\\') + 1);
+	exePath = std::string(path);
+	exeRoot = exePath.substr(0, exePath.rfind('\\') + 1);
 
 	InitGLFW();
-	GLFWwindow* window = InitWindow(ViewportWidth, ViewportHeight, "LearnOpenGL");
+	window = InitWindow(ViewportWidth, ViewportHeight, "LearnOpenGL");
 	if (window == nullptr)
-		return -1;
+		return false;
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
+		return false;
 	}
 
 	glViewport(0, 0, ViewportWidth, ViewportHeight);
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
+	return true;
+}
+
+int main(int argc, char *argv[])
+{
+	if (!Init(argv[0]))
+		return -1;
 
 	Shader shader(exeRoot + "Shaders\\DefaultVertexShader.glsl", exeRoot + "Shaders\\DefaultFragmentShader.glsl");
 
 	unsigned int VAO = PrepareData(
 		{
-			 //vert				//color
-			 0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // top right
-			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
-			-0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 0.0f // top left
-		},
-		{  // note that we start from 0!
-			0, 1, 3,   // first triangle
-			1, 2, 3    // second triangle
+			// positions         // colors
+			0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+		   -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+			0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
 		});
+
+	//-----------------Prepare texture------------------------
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannels;
+	std::string imagePath = exeRoot + "Textures\\container.jpg";
+	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Failed to load texture" << std::endl;
+
+	stbi_image_free(data);
+	//--------------------------------------------------------
 
 	glBindVertexArray(VAO);
 	shader.Use();
 	int vertexColorLocation = shader.GetUniformLocation("ourColor");
+	int vertexOffsetLocation = shader.GetUniformLocation("offset");
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -139,7 +171,7 @@ int main(int argc, char *argv[])
 		glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
