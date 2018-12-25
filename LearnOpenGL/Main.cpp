@@ -82,11 +82,15 @@ unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indices.data(), GL_STATIC_DRAW);
 	}
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	unsigned int stride = 8 * sizeof(float);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	Unbind();
 
@@ -124,10 +128,15 @@ int main(int argc, char *argv[])
 
 	unsigned int VAO = PrepareData(
 		{
-			// positions         // colors
-			0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-		   -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-			0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+			// positions         // colors           // texture coords
+			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+		   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+		   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+		},
+		{
+			0, 1, 3, // first triangle
+			1, 2, 3  // second triangle
 		});
 
 	//-----------------Prepare texture------------------------
@@ -155,6 +164,7 @@ int main(int argc, char *argv[])
 	stbi_image_free(data);
 	//--------------------------------------------------------
 
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
 	shader.Use();
 	int vertexColorLocation = shader.GetUniformLocation("ourColor");
@@ -172,8 +182,8 @@ int main(int argc, char *argv[])
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 		glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
