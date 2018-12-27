@@ -97,20 +97,17 @@ unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int
 	return VAO;
 }
 
-void SetGlobalTextureParameters()
-{
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_set_flip_vertically_on_load(true);
-}
-
-unsigned int PrepareTexture(const char* path, int dataFromat)
+unsigned int PrepareTexture(const char* path, int dataFormat, int filtering)
 {
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, nrChannels;
 	std::string imagePath = exeRoot + path;
@@ -118,7 +115,7 @@ unsigned int PrepareTexture(const char* path, int dataFromat)
 
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, dataFromat, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -161,20 +158,18 @@ int main(int argc, char *argv[])
 	unsigned int VAO = PrepareData(
 		{
 			// positions         // colors           // texture coords
-			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // top right
+			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // bottom right
 		   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+		   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // top left 
 		},
 		{
 			0, 1, 3, // first triangle
 			1, 2, 3  // second triangle
 		});
 
-	SetGlobalTextureParameters();
-
-	unsigned int texture1 = PrepareTexture("Textures\\container.jpg", GL_RGB);
-	unsigned int texture2 = PrepareTexture("Textures\\awesomeface.png", GL_RGBA);
+	unsigned int texture1 = PrepareTexture("Textures\\container.jpg", GL_RGB, GL_REPEAT);
+	unsigned int texture2 = PrepareTexture("Textures\\awesomeface.png", GL_RGBA, GL_REPEAT);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture1);
@@ -184,22 +179,12 @@ int main(int argc, char *argv[])
 	shader.Use();
 	glUniform1i(shader.GetUniformLocation("texture1"), 0);
 	glUniform1i(shader.GetUniformLocation("texture2"), 1);
-	//int vertexColorLocation = shader.GetUniformLocation("ourColor");
-	//int vertexOffsetLocation = shader.GetUniformLocation("offset");
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		//float timeValue = glfwGetTime();
-		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		//glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
-
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
