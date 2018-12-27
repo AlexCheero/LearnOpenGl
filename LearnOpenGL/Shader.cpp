@@ -58,6 +58,7 @@ GLuint Shader::CreateShaderObjectFromSource(GLenum type, const GLchar* shaderSou
 
 void Shader::LogShaderCompilationError(GLenum type, GLuint shader) const
 {
+	//why not working without const?
 	const char* shaderType;
 	switch (type)
 	{

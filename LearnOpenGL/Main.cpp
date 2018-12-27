@@ -97,6 +97,38 @@ unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int
 	return VAO;
 }
 
+void SetGlobalTextureParameters()
+{
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_set_flip_vertically_on_load(true);
+}
+
+unsigned int PrepareTexture(const char* path, int dataFromat)
+{
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	int width, height, nrChannels;
+	std::string imagePath = exeRoot + path;
+	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, dataFromat, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		Log() << "Failed to load texture" << '\n';
+
+	stbi_image_free(data);
+	
+	return texture;
+}
+
 bool Init(char* path)
 {
 	exePath = std::string(path);
@@ -139,36 +171,21 @@ int main(int argc, char *argv[])
 			1, 2, 3  // second triangle
 		});
 
-	//-----------------Prepare texture------------------------
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	SetGlobalTextureParameters();
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	unsigned int texture1 = PrepareTexture("Textures\\container.jpg", GL_RGB);
+	unsigned int texture2 = PrepareTexture("Textures\\awesomeface.png", GL_RGBA);
 
-	int width, height, nrChannels;
-	std::string imagePath = exeRoot + "Textures\\container.jpg";
-	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannels, 0);
-
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-		Log() << "Failed to load texture" << '\n';
-
-	stbi_image_free(data);
-	//--------------------------------------------------------
-
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture2);
 	glBindVertexArray(VAO);
 	shader.Use();
-	int vertexColorLocation = shader.GetUniformLocation("ourColor");
-	int vertexOffsetLocation = shader.GetUniformLocation("offset");
+	glUniform1i(shader.GetUniformLocation("texture1"), 0);
+	glUniform1i(shader.GetUniformLocation("texture2"), 1);
+	//int vertexColorLocation = shader.GetUniformLocation("ourColor");
+	//int vertexOffsetLocation = shader.GetUniformLocation("offset");
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -178,9 +195,9 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
+		//float timeValue = glfwGetTime();
+		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		//glUniform4f(vertexColorLocation, 1 - greenValue, greenValue, 0.0f, 1.0f);
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
