@@ -184,20 +184,29 @@ int main(int argc, char *argv[])
 	glUniform1i(shader.GetUniformLocation("texture1"), 0);
 	glUniform1i(shader.GetUniformLocation("texture2"), 1);
 
+	//----------Transformation matrices----------
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection;							  //cast to float or set param type as float?
+	projection = glm::perspective(glm::radians(45.0f), (float)ViewportWidth / ViewportHeight, 0.1f, 100.0f);
+	//-------------------------------------------
+
 	while (!glfwWindowShouldClose(window))
 	{
 		ProcessInput(window);
 
+		//------------Transform------------
+		glUniformMatrix4fv(shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		//---------------------------------
+
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		//----Transform----
-		glm::mat4 trans(1.0f);
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		glUniformMatrix4fv(shader.GetUniformLocation("transform"), 1, GL_FALSE, glm::value_ptr(trans));
-		//-----------------
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
