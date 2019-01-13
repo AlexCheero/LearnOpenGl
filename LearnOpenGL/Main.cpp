@@ -25,6 +25,21 @@ std::string exePath;
 std::string exeRoot;
 GLFWwindow* window;
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+const float MaxPitch = 89.0f;
+float yaw = -90.0f;
+float pitch = 0.0f;
+const float MaxFov = 90.0f;
+const float MinFov = 30.0f;
+const float DefaultFov = 45.0f;
+float Fov = DefaultFov;
+
 void InitGLFW()
 {
 	glfwInit();
@@ -52,10 +67,66 @@ void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+void MouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	static float lastMouseX = ViewportWidth / 2;
+	static float lastMouseY = ViewportHeight / 2;
+	static bool firstMouse = true;
+	if (firstMouse)
+	{
+		lastMouseX = xpos;
+		lastMouseY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastMouseX;
+	float yoffset = lastMouseY - ypos;
+	lastMouseX = xpos;
+	lastMouseY = ypos;
+
+	float sensitivity = 0.05f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > MaxPitch)
+		pitch = MaxPitch;
+	if (pitch < -MaxPitch)
+		pitch = -MaxPitch;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	front.y = sin(glm::radians(pitch));
+	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	cameraFront = glm::normalize(front);
+}
+
+void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (Fov >= MinFov && Fov <= MaxFov)
+		Fov -= yoffset;
+	if (Fov <= MinFov)
+		Fov = MinFov;
+	if (Fov >= MaxFov)
+		Fov = MaxFov;
+}
+
 void ProcessInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	float cameraSpeed = 2.5f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	glm::vec3 camRight = glm::normalize(glm::cross(cameraFront, cameraUp));
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= camRight * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += camRight * cameraSpeed;
 }
 
 void Unbind()
@@ -150,6 +221,9 @@ bool Init(char* path)
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
 	glEnable(GL_DEPTH_TEST);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, MouseCallback);
+	glfwSetScrollCallback(window, ScrollCallback);
 	return true;
 }
 
@@ -236,16 +310,20 @@ int main(int argc, char *argv[])
 
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//----------Transformation matrices----------
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 view;
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection;							  //cast to float or set param type as float?
-		projection = glm::perspective(glm::radians(45.0f), (float)ViewportWidth / ViewportHeight, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(Fov), static_cast<float>(ViewportWidth) / ViewportHeight, 0.1f, 100.0f);
 		//-------------------------------------------
 
 		//------------Transform------------
