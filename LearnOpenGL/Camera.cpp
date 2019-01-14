@@ -1,12 +1,8 @@
 #include "Camera.h"
-#include <GLFW/glfw3.h>
 
-#include <glm/detail/func_geometric.inl>
-#include <glm/detail/func_trigonometric.inl>
-
-void Camera::Move(EMoveDirection direction, GLFWwindow& window, float delta)
+void Camera::Move(EMoveDirection direction, float delta)
 {
-	float speedDelta = camSpeed * delta;
+	float speedDelta = params.camSpeed * delta;
 	switch (direction)
 	{
 	case EMoveDirection::Forward:
@@ -16,10 +12,10 @@ void Camera::Move(EMoveDirection direction, GLFWwindow& window, float delta)
 		cameraPos -= speedDelta * cameraFront;
 		break;
 	case EMoveDirection::Right:
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
 		break;
 	case EMoveDirection::Left:
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
 		break;
 	default: 
 		break;
@@ -28,8 +24,8 @@ void Camera::Move(EMoveDirection direction, GLFWwindow& window, float delta)
 
 void Camera::Rotate(float x, float y)
 {
-	static float lastMouseX = ViewportWidth / 2;
-	static float lastMouseY = ViewportHeight / 2;
+	static float lastMouseX = params.width / 2;
+	static float lastMouseY = params.height / 2;
 	static bool firstMouse = true;
 	if (firstMouse)
 	{
@@ -43,17 +39,16 @@ void Camera::Rotate(float x, float y)
 	lastMouseX = x;
 	lastMouseY = y;
 
-	float sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+	xoffset *= params.sensitivity;
+	yoffset *= params.sensitivity;
 
 	yaw += xoffset;
 	pitch += yoffset;
 
-	if (pitch > MaxPitch)
-		pitch = MaxPitch;
-	if (pitch < -MaxPitch)
-		pitch = -MaxPitch;
+	if (pitch > CameraParams::MaxPitch)
+		pitch = CameraParams::MaxPitch;
+	if (pitch < -CameraParams::MaxPitch)
+		pitch = -CameraParams::MaxPitch;
 
 	glm::vec3 front;
 	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
@@ -62,12 +57,12 @@ void Camera::Rotate(float x, float y)
 	cameraFront = glm::normalize(front);
 }
 
-void Camera::SetFov(float newFov)
+void Camera::SetFov(float fovDelta)
 {
-	if (fov >= MinFov && fov <= MaxFov)
-		fov -= newFov;
-	if (fov <= MinFov)
-		fov = MinFov;
-	if (fov >= MaxFov)
-		fov = MaxFov;
+	if (params.fov >= CameraParams::MinFov && params.fov <= CameraParams::MaxFov)
+		params.fov -= fovDelta;
+	if (params.fov <= CameraParams::MinFov)
+		params.fov = CameraParams::MinFov;
+	if (params.fov >= CameraParams::MaxFov)
+		params.fov = CameraParams::MaxFov;
 }

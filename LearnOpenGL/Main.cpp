@@ -13,6 +13,8 @@
 #include "Shader.h"
 #include "Log.h"
 
+#include "Camera.h"
+
 struct Color
 {
 	float r, g, b, a;
@@ -25,20 +27,10 @@ std::string exePath;
 std::string exeRoot;
 GLFWwindow* window;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-const float MaxPitch = 89.0f;
-float yaw = -90.0f;
-float pitch = 0.0f;
-const float MaxFov = 90.0f;
-const float MinFov = 30.0f;
-const float DefaultFov = 45.0f;
-float Fov = DefaultFov;
+Camera mainCamera;
 
 void InitGLFW()
 {
@@ -69,64 +61,26 @@ void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	static float lastMouseX = ViewportWidth / 2;
-	static float lastMouseY = ViewportHeight / 2;
-	static bool firstMouse = true;
-	if (firstMouse)
-	{
-		lastMouseX = xpos;
-		lastMouseY = ypos;
-		firstMouse = false;
-	}
-
-	float xoffset = xpos - lastMouseX;
-	float yoffset = lastMouseY - ypos;
-	lastMouseX = xpos;
-	lastMouseY = ypos;
-
-	float sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	if (pitch > MaxPitch)
-		pitch = MaxPitch;
-	if (pitch < -MaxPitch)
-		pitch = -MaxPitch;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	front.y = sin(glm::radians(pitch));
-	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-	cameraFront = glm::normalize(front);
+	mainCamera.Rotate(xpos, ypos);
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	if (Fov >= MinFov && Fov <= MaxFov)
-		Fov -= yoffset;
-	if (Fov <= MinFov)
-		Fov = MinFov;
-	if (Fov >= MaxFov)
-		Fov = MaxFov;
+	mainCamera.SetFov(yoffset);
 }
 
 void ProcessInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		mainCamera.Move(EMoveDirection::Forward, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
-	glm::vec3 camRight = glm::normalize(glm::cross(cameraFront, cameraUp));
+		mainCamera.Move(EMoveDirection::Backward, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= camRight * cameraSpeed;
+		mainCamera.Move(EMoveDirection::Left, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += camRight * cameraSpeed;
+		mainCamera.Move(EMoveDirection::Right, deltaTime);
 }
 
 void Unbind()
@@ -318,18 +272,9 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//----------Transformation matrices----------
-		glm::mat4 view;
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-		glm::mat4 projection;							  //cast to float or set param type as float?
-		projection = glm::perspective(glm::radians(Fov), static_cast<float>(ViewportWidth) / ViewportHeight, 0.1f, 100.0f);
-		//-------------------------------------------
-
 		//------------Transform------------
-		
-		glUniformMatrix4fv(shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
+		glUniformMatrix4fv(shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//---------------------------------
 
 		//iterate through cube positions
