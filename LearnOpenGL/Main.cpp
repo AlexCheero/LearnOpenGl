@@ -90,13 +90,12 @@ void Unbind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-unsigned int PrepareData(std::vector<float> vertexData, std::vector<unsigned int> indices = {})
+unsigned int PrepareData(unsigned int& VBO, std::vector<float> vertexData, std::vector<unsigned int> indices = {})
 {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	GLsizeiptr vertsSize = sizeof(*vertexData.data()) * vertexData.size();
@@ -186,9 +185,12 @@ int main(int argc, char *argv[])
 	if (!Init(argv[0]))
 		return -1;
 
-	Shader shader(exeRoot + "Shaders\\DefaultVertexShader.glsl", exeRoot + "Shaders\\DefaultFragmentShader.glsl");
+	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
+	Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
-	unsigned int VAO = PrepareData(
+	//todo: rework and refator structure
+	unsigned int VBO;
+	unsigned int VAO = PrepareData(VBO,
 		{
 			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -237,18 +239,16 @@ int main(int argc, char *argv[])
 			1, 2, 3  // second triangle
 		});
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3( 0.0f,  0.0f,  0.0f),
-		glm::vec3( 2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3( 2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3( 1.3f, -2.0f, -2.5f),
-		glm::vec3( 1.5f,  2.0f, -2.5f),
-		glm::vec3( 1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
+	//------------Light VAO------------
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	// we only need to bind to the VBO, the container's VBO's data already contains the correct data.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// set the vertex attributes (only position data for our lamp)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	//---------------------------------
 
 	unsigned int texture1 = PrepareTexture("Textures\\container.jpg", GL_RGB, GL_REPEAT);
 	unsigned int texture2 = PrepareTexture("Textures\\awesomeface.png", GL_RGBA, GL_REPEAT);
@@ -258,9 +258,10 @@ int main(int argc, char *argv[])
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 	glBindVertexArray(VAO);
-	shader.Use();
-	glUniform1i(shader.GetUniformLocation("texture1"), 0);
-	glUniform1i(shader.GetUniformLocation("texture2"), 1);
+
+	//-----------Light position-----------
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	//------------------------------------
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -272,25 +273,38 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//------------Transform------------
-		glUniformMatrix4fv(shader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
-		glUniformMatrix4fv(shader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
-		//---------------------------------
+//------------Draw Object------------
+		objectShader.Use();
+		glUniform3f(objectShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
+		//------------Camera Transformations------------
+		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
+		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
+		//----------------------------------------------
 
-		//iterate through cube positions
-		for (size_t i = 0; i < 10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-			glUniformMatrix4fv(shader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3());
+		glUniformMatrix4fv(objectShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+//-----------------------------------
 
-		
+//------------Draw Lamp------------
+		lampShader.Use();
+		glUniform3f(lampShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(lampShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
+		//------------Camera Transformations------------
+		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
+		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
+		//----------------------------------------------
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		glUniformMatrix4fv(lampShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+//---------------------------------
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
