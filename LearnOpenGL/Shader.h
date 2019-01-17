@@ -5,7 +5,7 @@
 class Shader
 {
 	static const int logLength = 512;
-public:
+private:
 	GLuint _shaderProgram;
 
 	GLuint CreateShaderObjectFromFile(const GLchar* filePath, GLenum type);
@@ -16,6 +16,6 @@ public:
 public:
 	Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
 	void Use() const { glUseProgram(_shaderProgram); }
-	int GetUniformLocation (const char* name) { return glGetUniformLocation(_shaderProgram, name); }
+	int GetUniformLocation (const char* name) const { return glGetUniformLocation(_shaderProgram, name); }
 };
 

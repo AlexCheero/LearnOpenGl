@@ -59,10 +59,15 @@ public:
 	void Rotate(float x, float y);
 	void SetFov(float fovDelta);
 	
-	glm::mat4 GetView() { return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); }
-	glm::mat4 GetProjection()
+	glm::mat4 GetView() const { return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); }
+	glm::mat4 GetProjection() const
 	{
 		return glm::perspective(glm::radians(params.fov), static_cast<float>(params.width) / params.height, params.nearClipPlane, params.farClipPlane);
+	}
+
+	const glm::vec3 GetPosition() const
+	{
+		return cameraPos;
 	}
 };
 

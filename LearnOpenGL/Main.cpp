@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 	unsigned int stride = 6 * sizeof(float);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(float));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	Unbind();
 	//----------------------------------
@@ -258,6 +258,8 @@ int main(int argc, char *argv[])
 		glUniform3f(objectShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
 		glUniform3f(objectShader.GetUniformLocation("lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glm::vec3 camPosition = mainCamera.GetPosition();
+		glUniform3f(objectShader.GetUniformLocation("viewPos"), camPosition.x, camPosition.y, camPosition.z);
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
