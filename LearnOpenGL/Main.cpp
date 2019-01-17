@@ -90,35 +90,41 @@ void Unbind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-unsigned int PrepareData(unsigned int& VBO, std::vector<float> vertexData, std::vector<unsigned int> indices = {})
+unsigned int PrepareVAO()
 {
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+	return VAO;
+}
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	GLsizeiptr vertsSize = sizeof(*vertexData.data()) * vertexData.size();
-	glBufferData(GL_ARRAY_BUFFER, vertsSize, vertexData.data(), GL_STATIC_DRAW);
+template <class T>
+unsigned int PrepareBufferObject(std::vector<T> data, GLenum target, GLenum usage = GL_STATIC_DRAW)
+{
+	unsigned int BufferObject;
+	glGenBuffers(1, &BufferObject);
+	glBindBuffer(target, BufferObject);
+	GLsizeiptr dataSize = sizeof(*data.data()) * data.size();
+	glBufferData(target, dataSize, data.data(), usage);
+	return BufferObject;
+}
+
+unsigned int PrepareData(unsigned int& VBO, std::vector<float> vertexData, std::vector<unsigned int> indices = {})
+{
+	unsigned int VAO = PrepareVAO();
+	VBO = PrepareBufferObject(vertexData, GL_ARRAY_BUFFER);
 
 	if (indices.size() > 0)
 	{
-		unsigned int EBO;
-		glGenBuffers(1, &EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		GLsizeiptr indSize = sizeof(*indices.data()) * indices.size();
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize, indices.data(), GL_STATIC_DRAW);
+		unsigned int EBO = PrepareBufferObject(indices, GL_ELEMENT_ARRAY_BUFFER);
 	}
 
 	unsigned int stride = 5 * sizeof(float);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
 
 	Unbind();
 
@@ -233,16 +239,10 @@ int main(int argc, char *argv[])
 			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-		},
-		{
-			0, 1, 3, // first triangle
-			1, 2, 3  // second triangle
 		});
 
 	//------------Light VAO------------
-	unsigned int lightVAO;
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
+	unsigned int lightVAO = PrepareVAO();
 	// we only need to bind to the VBO, the container's VBO's data already contains the correct data.
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// set the vertex attributes (only position data for our lamp)
