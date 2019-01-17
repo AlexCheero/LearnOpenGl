@@ -172,56 +172,59 @@ int main(int argc, char *argv[])
 	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
 	Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
+	std::vector<float> verticies =
+	{
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+
 	//------------Object VAO------------
 	unsigned int VAO = PrepareVAO();
-	std::vector<float> indicies =
-	{
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-	unsigned int VBO = PrepareBufferObject(indicies, GL_ARRAY_BUFFER);
-	unsigned int stride = 5 * sizeof(float);
+	unsigned int VBO = PrepareBufferObject(verticies, GL_ARRAY_BUFFER);
+	unsigned int stride = 6 * sizeof(float);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(float));
+	glEnableVertexAttribArray(1);
 	Unbind();
 	//----------------------------------
 
@@ -254,6 +257,7 @@ int main(int argc, char *argv[])
 		objectShader.Use();
 		glUniform3f(objectShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
+		glUniform3f(objectShader.GetUniformLocation("lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
@@ -263,14 +267,15 @@ int main(int argc, char *argv[])
 		model = glm::translate(model, glm::vec3());
 		glUniformMatrix4fv(objectShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 
+		glm::mat3 normalMartix = glm::transpose(glm::inverse(model));
+		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 //-----------------------------------
 
 //------------Draw Lamp------------
 		glBindVertexArray(lightVAO);
 		lampShader.Use();
-		glUniform3f(lampShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
-		glUniform3f(lampShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
 		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
