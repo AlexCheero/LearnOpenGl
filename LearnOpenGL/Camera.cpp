@@ -12,10 +12,16 @@ void Camera::Move(EMoveDirection direction, float delta)
 		cameraPos -= speedDelta * cameraFront;
 		break;
 	case EMoveDirection::Right:
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
+		cameraPos += glm::normalize(glm::cross(cameraFront, worldUp)) * speedDelta;
 		break;
 	case EMoveDirection::Left:
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speedDelta;
+		cameraPos -= glm::normalize(glm::cross(cameraFront, worldUp)) * speedDelta;
+		break;
+	case EMoveDirection::Up:
+		cameraPos += worldUp * speedDelta;
+		break;
+	case EMoveDirection::Down:
+		cameraPos -= worldUp * speedDelta;
 		break;
 	default: 
 		break;

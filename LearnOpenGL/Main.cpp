@@ -81,6 +81,10 @@ void ProcessInput(GLFWwindow* window)
 		mainCamera.Move(EMoveDirection::Left, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		mainCamera.Move(EMoveDirection::Right, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		mainCamera.Move(EMoveDirection::Down, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		mainCamera.Move(EMoveDirection::Up, deltaTime);
 }
 
 void Unbind()

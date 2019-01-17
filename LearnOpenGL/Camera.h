@@ -8,7 +8,9 @@ enum class EMoveDirection
 	Forward,
 	Backward,
 	Right,
-	Left
+	Left,
+	Up,
+	Down
 };
 
 struct CameraParams
@@ -42,7 +44,7 @@ class Camera
 	//create transform class and move it to transform
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	//-----------------------------------------------
 
 	static constexpr float DefaultYaw = -90.0f;
@@ -59,7 +61,7 @@ public:
 	void Rotate(float x, float y);
 	void SetFov(float fovDelta);
 	
-	glm::mat4 GetView() const { return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); }
+	glm::mat4 GetView() const { return glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp); }
 	glm::mat4 GetProjection() const
 	{
 		return glm::perspective(glm::radians(params.fov), static_cast<float>(params.width) / params.height, params.nearClipPlane, params.farClipPlane);
