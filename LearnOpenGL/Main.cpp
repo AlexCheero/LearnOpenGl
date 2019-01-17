@@ -242,10 +242,6 @@ int main(int argc, char *argv[])
 	Unbind();
 	//---------------------------------
 
-	//-----------Light position-----------
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	//------------------------------------
-
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -255,6 +251,12 @@ int main(int argc, char *argv[])
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//-----------Light position-----------
+		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+		//------------------------------------
 
 //------------Draw Object------------
 		glBindVertexArray(VAO);
