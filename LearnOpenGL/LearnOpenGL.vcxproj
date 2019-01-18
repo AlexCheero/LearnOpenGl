@@ -88,13 +88,14 @@
       <AdditionalDependencies>opengl32.lib;GLFW_Debug/glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>XCOPY "$(SolutionDir)Shaders" "$(TargetDir)\Shaders\" /S /Y</Command>
+      <Command>XCOPY "$(SolutionDir)Shaders" "$(TargetDir)\Shaders\" /S /Y
+XCOPY "$(SolutionDir)Textures" "$(TargetDir)\Textures\" /S /Y</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copying resources</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)Shaders</Outputs>
+      <Outputs>$(SolutionDir)Shaders;$(SolutionDir)Textures</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,6 +149,12 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shaders\1.colors.fs" />
+    <None Include="..\Shaders\1.colors.vs" />
+    <None Include="..\Shaders\1.lamp.fs" />
+    <None Include="..\Shaders\1.lamp.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
