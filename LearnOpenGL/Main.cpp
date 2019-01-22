@@ -266,12 +266,10 @@ int main(int argc, char *argv[])
 
 		glm::mat4 view = mainCamera.GetView();
 
-		glm::vec3 lp = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-		glUniform3fv(objectShader.GetUniformLocation("lightPos"), 1, glm::value_ptr(lp));
-
+		glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+		glUniform3fv(objectShader.GetUniformLocation("lightPos"), 1, glm::value_ptr(viewLightPos));
 
 		//------------Camera Transformations------------
-		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
