@@ -261,13 +261,21 @@ int main(int argc, char *argv[])
 //------------Draw Object------------
 		glBindVertexArray(VAO);
 		objectShader.Use();
-		glUniform3f(objectShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
+
+		glUniform3f(objectShader.GetUniformLocation("material.ambient"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(objectShader.GetUniformLocation("material.diffuse"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
 		glm::mat4 view = mainCamera.GetView();
 
 		glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-		glUniform3fv(objectShader.GetUniformLocation("lightPos"), 1, glm::value_ptr(viewLightPos));
+		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(viewLightPos));
+
+		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
+		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
+		glUniform3f(objectShader.GetUniformLocation("light.specular"), 1.0f, 1.0f, 1.0f);
 
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
