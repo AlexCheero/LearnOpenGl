@@ -263,20 +263,26 @@ int main(int argc, char *argv[])
 		objectShader.Use();
 		glUniform3f(objectShader.GetUniformLocation("objectColor"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
-		glUniform3f(objectShader.GetUniformLocation("lightPos"), lightPos.x, lightPos.y, lightPos.z);
-		glm::vec3 camPosition = mainCamera.GetPosition();
-		glUniform3f(objectShader.GetUniformLocation("viewPos"), camPosition.x, camPosition.y, camPosition.z);
+
+		glm::mat4 view = mainCamera.GetView();
+
+		glm::vec3 lp = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+		glUniform3fv(objectShader.GetUniformLocation("lightPos"), 1, glm::value_ptr(lp));
+
+
 		//------------Camera Transformations------------
-		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
+		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3());
-		glUniformMatrix4fv(objectShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glm::mat4 modelView = view * model;
+		glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
 
-		glm::mat3 normalMartix = glm::transpose(glm::inverse(model));
+		glm::mat3 normalMartix = glm::transpose(glm::inverse(modelView));
 		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
+
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 //-----------------------------------
@@ -285,7 +291,7 @@ int main(int argc, char *argv[])
 		glBindVertexArray(lightVAO);
 		lampShader.Use();
 		//------------Camera Transformations------------
-		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetView()));
+		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
