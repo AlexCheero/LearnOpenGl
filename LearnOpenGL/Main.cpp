@@ -123,7 +123,6 @@ unsigned int PrepareTexture(const char* path, int filtering)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, filtering);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, nrComponents;
 	std::string imagePath = exeRoot + path;
@@ -146,6 +145,7 @@ unsigned int PrepareTexture(const char* path, int filtering)
 		Log() << "Failed to load texture" << '\n';
 
 	stbi_image_free(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	return texture;
 }
@@ -253,8 +253,22 @@ int main(int argc, char *argv[])
 	Unbind();
 	//---------------------------------
 
+	//-------------Textures stuff-------------
+	stbi_set_flip_vertically_on_load(true);
+
 	int diffuseMap = PrepareTexture("Textures\\container2.png", GL_REPEAT);
-	glUniform1f(objectShader.GetUniformLocation("material.diffuse"), 0);
+	int specularMap = PrepareTexture("Textures\\container2_specular.png", GL_REPEAT);
+
+	objectShader.Use();
+	//define what sampler corresponds to what texture
+	glUniform1i(objectShader.GetUniformLocation("material.diffuse"), 0);
+	glUniform1i(objectShader.GetUniformLocation("material.specular"), 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specularMap);
+	//----------------------------------------
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -267,6 +281,7 @@ int main(int argc, char *argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//-----------Light position-----------
+		//glm::vec3 lightPos(0.5f, 0.3f, 2.0f);
 		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
 		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
@@ -277,8 +292,6 @@ int main(int argc, char *argv[])
 		objectShader.Use();
 		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
 
-		//glUniform3f(objectShader.GetUniformLocation("material.ambient"), 1.0f, 0.5f, 0.31f);
-		//glUniform3f(objectShader.GetUniformLocation("material.diffuse"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
