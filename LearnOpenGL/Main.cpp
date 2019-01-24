@@ -230,6 +230,20 @@ int main(int argc, char *argv[])
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] =
+	{
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	//------------Object VAO------------
 	unsigned int VAO = PrepareVAO();
 	unsigned int VBO = PrepareBufferObject(verticies, GL_ARRAY_BUFFER);
@@ -257,21 +271,21 @@ int main(int argc, char *argv[])
 	stbi_set_flip_vertically_on_load(true);
 
 	int diffuseMap = PrepareTexture("Textures\\container2.png", GL_REPEAT);
-	int specularMap = PrepareTexture("Textures\\lighting_maps_specular_color.png", GL_REPEAT);
-	int emissionMap = PrepareTexture("Textures\\matrix.jpg", GL_REPEAT);
+	int specularMap = PrepareTexture("Textures\\container2_specular.png", GL_REPEAT);
+	//int emissionMap = PrepareTexture("Textures\\matrix.jpg", GL_REPEAT);
 
 	objectShader.Use();
 	//define what sampler corresponds to what texture
 	glUniform1i(objectShader.GetUniformLocation("material.diffuse"), 0);
 	glUniform1i(objectShader.GetUniformLocation("material.specular"), 1);
-	glUniform1i(objectShader.GetUniformLocation("material.emission"), 2);
+	//glUniform1i(objectShader.GetUniformLocation("material.emission"), 2);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, specularMap);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, emissionMap);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, emissionMap);
 	//----------------------------------------
 
 	while (!glfwWindowShouldClose(window))
@@ -285,10 +299,10 @@ int main(int argc, char *argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//-----------Light position-----------
-		//glm::vec3 lightPos(0.5f, 0.3f, 2.0f);
-		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+		glm::vec3 lightPos(-0.2f, -1.0f, -0.3f);
+		//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+		//lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+		//lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 		//------------------------------------
 
 //------------Draw Object------------
@@ -312,15 +326,20 @@ int main(int argc, char *argv[])
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3());
-		glm::mat4 modelView = view * model;
-		glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
+		for (int i = 0; i < 10; ++i)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+			glm::mat4 modelView = view * model;
+			glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
 
-		glm::mat3 normalMartix = glm::transpose(glm::inverse(modelView));
-		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
+			glm::mat3 normalMartix = glm::transpose(glm::inverse(modelView));
+			glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 //-----------------------------------
 
 //------------Draw Lamp------------
@@ -331,7 +350,7 @@ int main(int argc, char *argv[])
 		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
-		model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
 		glUniformMatrix4fv(lampShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
