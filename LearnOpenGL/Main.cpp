@@ -257,17 +257,21 @@ int main(int argc, char *argv[])
 	stbi_set_flip_vertically_on_load(true);
 
 	int diffuseMap = PrepareTexture("Textures\\container2.png", GL_REPEAT);
-	int specularMap = PrepareTexture("Textures\\container2_specular.png", GL_REPEAT);
+	int specularMap = PrepareTexture("Textures\\lighting_maps_specular_color.png", GL_REPEAT);
+	int emissionMap = PrepareTexture("Textures\\matrix.jpg", GL_REPEAT);
 
 	objectShader.Use();
 	//define what sampler corresponds to what texture
 	glUniform1i(objectShader.GetUniformLocation("material.diffuse"), 0);
 	glUniform1i(objectShader.GetUniformLocation("material.specular"), 1);
+	glUniform1i(objectShader.GetUniformLocation("material.emission"), 2);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, specularMap);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, emissionMap);
 	//----------------------------------------
 
 	while (!glfwWindowShouldClose(window))
