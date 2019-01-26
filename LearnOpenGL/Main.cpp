@@ -305,18 +305,18 @@ int main(int argc, char *argv[])
 		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 		//------------------------------------
 
+		glm::mat4 view = mainCamera.GetView();
+		glm::mat4 projection = mainCamera.GetProjection();
+
 //------------Draw Object------------
 		glBindVertexArray(VAO);
 		objectShader.Use();
-		glUniform3f(objectShader.GetUniformLocation("lightColor"), 1.0f, 1.0f, 1.0f);
 
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
-		glm::mat4 view = mainCamera.GetView();
-
 		glm::vec3 lightDir = -lightPos;
-		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(lightDir));
+		glUniform3fv(objectShader.GetUniformLocation("light.direction"), 1, glm::value_ptr(lightDir));
 
 		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
 
 		//------------Camera Transformations------------
 		glUniform3fv(objectShader.GetUniformLocation("viewPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
-		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
+		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
 
 		for (int i = 0; i < 10; ++i)
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
 		lampShader.Use();
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
+		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
 
 		glm::mat4 model = glm::mat4(1.0f);
