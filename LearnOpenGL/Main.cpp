@@ -299,10 +299,10 @@ int main(int argc, char *argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//-----------Light position-----------
-		glm::vec3 lightPos(-0.2f, -1.0f, -0.3f);
-		//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-		//lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-		//lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+		//glm::vec3 lightPos(-0.2f, -1.0f, -0.3f);
+		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
 		//------------------------------------
 
 //------------Draw Object------------
@@ -315,14 +315,15 @@ int main(int argc, char *argv[])
 
 		glm::mat4 view = mainCamera.GetView();
 
-		glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0f));
-		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(viewLightPos));
+		glm::vec3 lightDir = -lightPos;
+		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(lightDir));
 
 		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
 		glUniform3f(objectShader.GetUniformLocation("light.specular"), 1.0f, 1.0f, 1.0f);
 
 		//------------Camera Transformations------------
+		glUniform3fv(objectShader.GetUniformLocation("viewPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(mainCamera.GetProjection()));
 		//----------------------------------------------
 
@@ -332,10 +333,10 @@ int main(int argc, char *argv[])
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-			glm::mat4 modelView = view * model;
-			glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
+			glUniformMatrix4fv(objectShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
 
-			glm::mat3 normalMartix = glm::transpose(glm::inverse(modelView));
+			glm::mat3 normalMartix = glm::transpose(glm::inverse(model));
 			glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);

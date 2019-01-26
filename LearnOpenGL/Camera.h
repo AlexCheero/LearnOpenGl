@@ -67,7 +67,7 @@ public:
 		return glm::perspective(glm::radians(params.fov), static_cast<float>(params.width) / params.height, params.nearClipPlane, params.farClipPlane);
 	}
 
-	const glm::vec3 GetPosition() const
+	const glm::vec3& GetPosition() const
 	{
 		return cameraPos;
 	}
