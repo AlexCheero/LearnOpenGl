@@ -22,7 +22,7 @@ private:
 	static constexpr float MaxFov = 90.0f;
 	static constexpr float MinFov = 30.0f;
 	static constexpr float DefaultFov = 45.0f;
-	static constexpr float DefaultCamSpeed = 2.5f;
+	static constexpr float DefaultCamSpeed = 5.0f;
 	static constexpr float DefaultSensitivity = 0.05f;
 	static constexpr int DefaultViewportWidth = 800;
 	static constexpr int DefaultViewportHeight = 600;
