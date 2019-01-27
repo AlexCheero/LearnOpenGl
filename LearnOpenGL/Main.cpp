@@ -322,6 +322,7 @@ int main(int argc, char *argv[])
 		glUniform3fv(objectShader.GetUniformLocation("light.direction"), 1, glm::value_ptr(lightViewDir));
 
 		glUniform1f(objectShader.GetUniformLocation("light.cutOff"), glm::cos(glm::radians(12.5f)));
+		glUniform1f(objectShader.GetUniformLocation("light.outerCutOff"), glm::cos(glm::radians(17.5f)));
 
 		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
