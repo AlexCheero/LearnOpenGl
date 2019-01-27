@@ -329,6 +329,15 @@ int main(int argc, char *argv[])
 									  , glm::vec3(0.5f, 0.5f, 0.5f)
 									  , 1.0f, 0.09f, 0.032f);
 		}
+
+		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(mainCamera.GetPosition(), 1.0f));
+		glm::vec3 lightViewCamDir = glm::vec3(view * glm::vec4(mainCamera.Front(), 0.0f));
+		SpotLight spotLight(lightViewPos
+						  , lightViewCamDir
+						  , glm::vec3(0.0f, 0.0f, 0.0f)
+						  , glm::vec3(1.0f, 1.0f, 1.0f)
+						  , glm::vec3(1.0f, 1.0f, 1.0f)
+						  , 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
 		//------------------------------------
 
 //------------Draw Object------------
@@ -341,6 +350,7 @@ int main(int argc, char *argv[])
 		dirLight.Apply(objectShader, "dirLight");
 		for (int i = 0; i < pointLightsCount; ++i)
 			pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
+		spotLight.Apply(objectShader, "spotLight");
 
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));

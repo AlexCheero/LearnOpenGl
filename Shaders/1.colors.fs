@@ -115,7 +115,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 	vec3 lightDir = normalize(light.position - fragPos);
 
-	float theta = dot(lightDir, normalize(-light.direction);
+	float theta = dot(lightDir, normalize(-light.direction));
 	float epsilion = light.cutOff - light.outerCutOff;
 	float intencity = clamp((theta - light.outerCutOff) / epsilion, 0.0, 1.0);
 
