@@ -43,6 +43,7 @@ public:
 
 class PointLight : public Light
 {
+protected:
 	float constant;
 	float linear;
 	float quadratic;
@@ -87,5 +88,31 @@ public:
 		glUniform1f(shader.GetUniformLocation((uniformStructName + ".constant").c_str()), constant);
 		glUniform1f(shader.GetUniformLocation((uniformStructName + ".linear").c_str()), linear);
 		glUniform1f(shader.GetUniformLocation((uniformStructName + ".quadratic").c_str()), quadratic);
+	}
+};
+
+class SpotLight : PointLight
+{
+	glm::vec3 direction;
+	
+	float cutOff;
+	float outerCutOff;
+
+public:
+	SpotLight(glm::vec3 coord, glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float cnst, float lin, float quad, float cut, float outerCut)
+		: PointLight(coord, amb, diff, spec, cnst, lin, quad)
+	{
+		direction = dir;
+		cutOff = cut;
+		outerCutOff = outerCut;
+	}
+
+	void Apply(Shader shader, std::string uniformStructName) override
+	{
+		PointLight::Apply(shader, uniformStructName);
+
+		glUniform3fv(shader.GetUniformLocation((uniformStructName + ".direction").c_str()), 1, glm::value_ptr(direction));
+		glUniform1f(shader.GetUniformLocation((uniformStructName + ".cutOff").c_str()), cutOff);
+		glUniform1f(shader.GetUniformLocation((uniformStructName + ".outerCutOff").c_str()), outerCutOff);
 	}
 };
