@@ -14,6 +14,7 @@
 #include "Log.h"
 
 #include "Camera.h"
+#include "Lights.h"
 
 struct Color
 {
@@ -22,7 +23,7 @@ struct Color
 
 int ViewportWidth = 800;
 int ViewportHeight = 600;
-Color ClearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
+Color ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 std::string exePath;
 std::string exeRoot;
 GLFWwindow* window;
@@ -298,15 +299,37 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//-----------Light position-----------
-		//glm::vec3 lightPos(-0.2f, -1.0f, -0.3f);
-		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-		//------------------------------------
-
 		glm::mat4 view = mainCamera.GetView();
 		glm::mat4 projection = mainCamera.GetProjection();
+
+		//-----------Light position-----------
+		//Direction
+		glm::vec3 lightViewDir = glm::vec3(view * glm::vec4(glm::vec3(-0.2f, -1.0f, -0.3f), 0.0f));
+		Light dirLight(lightViewDir
+					 , glm::vec3(0.05f, 0.05f, 0.05f)
+					 , glm::vec3(0.4f, 0.4f, 0.4f)
+					 , glm::vec3(0.5f, 0.5f, 0.5f));
+
+		//Point
+		glm::vec3 pointLightPositions[] =
+		{
+			glm::vec3(0.7f,  0.2f,  2.0f),
+			glm::vec3(2.3f, -3.3f, -4.0f),
+			glm::vec3(-4.0f,  2.0f, -12.0f),
+			glm::vec3(0.0f,  0.0f, -3.0f)
+		};
+		const int pointLightsCount = 4;
+		PointLight pointLights[pointLightsCount];
+		for (int i = 0; i < pointLightsCount; ++i)
+		{
+			glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(pointLightPositions[i], 1.0f));
+			pointLights[i] = PointLight(lightViewPos
+									  , glm::vec3(0.8f, 0.8f, 0.8f)
+									  , glm::vec3(1.0f, 1.0f, 1.0f)
+									  , glm::vec3(0.5f, 0.5f, 0.5f)
+									  , 1.0f, 0.09f, 0.032f);
+		}
+		//------------------------------------
 
 //------------Draw Object------------
 		glBindVertexArray(VAO);
@@ -315,22 +338,9 @@ int main(int argc, char *argv[])
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
-		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(mainCamera.GetPosition(), 1.0f));
-		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(lightViewPos));
-
-		glm::vec3 lightViewDir = glm::vec3(view * glm::vec4(mainCamera.Front(), 0.0f));
-		glUniform3fv(objectShader.GetUniformLocation("light.direction"), 1, glm::value_ptr(lightViewDir));
-
-		glUniform1f(objectShader.GetUniformLocation("light.cutOff"), glm::cos(glm::radians(12.5f)));
-		glUniform1f(objectShader.GetUniformLocation("light.outerCutOff"), glm::cos(glm::radians(17.5f)));
-
-		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
-		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
-		glUniform3f(objectShader.GetUniformLocation("light.specular"), 1.0f, 1.0f, 1.0f);
-
-		glUniform1f(objectShader.GetUniformLocation("light.constant"), 1.0f);
-		glUniform1f(objectShader.GetUniformLocation("light.linear"), 0.09f);
-		glUniform1f(objectShader.GetUniformLocation("light.quadratic"), 0.032f);
+		dirLight.Apply(objectShader, "dirLight");
+		for (int i = 0; i < pointLightsCount; ++i)
+			pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
 
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -360,12 +370,15 @@ int main(int argc, char *argv[])
 		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		glUniformMatrix4fv(lampShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+		for (int i = 0; i < pointLightsCount; ++i)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			glUniformMatrix4fv(lampShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 //---------------------------------
 
 		glfwSwapBuffers(window);
