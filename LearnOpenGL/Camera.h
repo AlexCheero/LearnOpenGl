@@ -71,5 +71,10 @@ public:
 	{
 		return cameraPos;
 	}
+
+	const glm::vec3& Front() const
+	{
+		return cameraFront;
+	}
 };
 

@@ -315,8 +315,13 @@ int main(int argc, char *argv[])
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
-		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(mainCamera.GetPosition(), 1.0f));
 		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(lightViewPos));
+
+		glm::vec3 lightViewDir = glm::vec3(view * glm::vec4(mainCamera.Front(), 0.0f));
+		glUniform3fv(objectShader.GetUniformLocation("light.direction"), 1, glm::value_ptr(lightViewDir));
+
+		glUniform1f(objectShader.GetUniformLocation("light.cutOff"), glm::cos(glm::radians(12.5f)));
 
 		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
