@@ -315,12 +315,16 @@ int main(int argc, char *argv[])
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 
-		glm::vec3 lightDir = glm::vec3(view * glm::vec4(-lightPos, 0.0f));
-		glUniform3fv(objectShader.GetUniformLocation("light.direction"), 1, glm::value_ptr(lightDir));
+		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(lightPos, 1.0f));
+		glUniform3fv(objectShader.GetUniformLocation("light.position"), 1, glm::value_ptr(lightViewPos));
 
 		glUniform3f(objectShader.GetUniformLocation("light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(objectShader.GetUniformLocation("light.diffuse"), 0.5f, 0.5f, 0.5f);
 		glUniform3f(objectShader.GetUniformLocation("light.specular"), 1.0f, 1.0f, 1.0f);
+
+		glUniform1f(objectShader.GetUniformLocation("light.constant"), 1.0f);
+		glUniform1f(objectShader.GetUniformLocation("light.linear"), 0.09f);
+		glUniform1f(objectShader.GetUniformLocation("light.quadratic"), 0.032f);
 
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
