@@ -85,17 +85,18 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;GLFW_Debug/glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;GLFW_Debug/glfw3.lib;assimp/assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>XCOPY "$(SolutionDir)Shaders" "$(TargetDir)\Shaders\" /S /Y
-XCOPY "$(SolutionDir)Textures" "$(TargetDir)\Textures\" /S /Y</Command>
+XCOPY "$(SolutionDir)Textures" "$(TargetDir)\Textures\" /S /Y
+XCOPY "$(SolutionDir)Dlls" "$(TargetDir)" /S /Y</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copying resources</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)Shaders;$(SolutionDir)Textures</Outputs>
+      <Outputs>$(SolutionDir)Shaders;$(SolutionDir)Textures;$(SolutionDir)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
