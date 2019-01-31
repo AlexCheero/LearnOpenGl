@@ -261,3 +261,7 @@ _Pvt_Extensions
 .fake/
 
 AssetsConfig.yaml
+
+# ignore WinMerge backup files
+*.bak
+*.orig
