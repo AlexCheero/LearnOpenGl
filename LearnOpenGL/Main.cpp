@@ -14,6 +14,7 @@
 
 #include "Camera.h"
 #include "Lights.h"
+#include "Model.h"
 
 struct Color
 {
@@ -244,6 +245,7 @@ int main(int argc, char *argv[])
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
+	/*
 	//------------Object VAO------------
 	unsigned int VAO = PrepareVAO();
 	unsigned int VBO = PrepareBufferObject(verticies, GL_ARRAY_BUFFER);
@@ -287,6 +289,9 @@ int main(int argc, char *argv[])
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, emissionMap);
 	//----------------------------------------
+	*/
+
+	Model model = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -339,6 +344,9 @@ int main(int argc, char *argv[])
 						  , 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
 		//------------------------------------
 
+		model.Draw(objectShader);
+
+		/*
 //------------Draw Object------------
 		glBindVertexArray(VAO);
 		objectShader.Use();
@@ -389,6 +397,7 @@ int main(int argc, char *argv[])
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 //---------------------------------
+		*/
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

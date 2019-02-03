@@ -9,6 +9,7 @@
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
+//todo load obj file and textures from the different paths
 void Model::LoadModel(std::string path)
 {
 	Assimp::Importer importer;
@@ -27,7 +28,7 @@ void Model::LoadModel(std::string path)
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene)
 {
-	//todo implement parent-chil system
+	//todo implement parent-child system
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -78,27 +79,42 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	//proc mat
 	if (mesh->mMaterialIndex >= 0)
 	{
+		//todo remove hardcode
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+		std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
 	return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
+		bool skip = false;
+		for (unsigned int j = 0; j < texturesLoaded.size(); ++j)
+		{
+			if (std::strcmp(texturesLoaded[j].path.data(), str.C_Str()) == 0)
+			{
+				textures.push_back(texturesLoaded[j]);
+				skip = true;
+				break;
+			}
+		}
+
+		if (skip)
+			continue;
+
 		Texture texture;
-		texture.id = TextureFromFile(str.C_Str, directory);
+		texture.id = TextureFromFile(str.C_Str(), directory);
 		texture.type = typeName;
-		texture.path = str.C_Str;
+		texture.path = str.C_Str();
 		textures.push_back(texture);
 	}
 
@@ -111,7 +127,7 @@ void Model::Draw(Shader shader)
 		meshes[i].Draw(shader);
 }
 
-//compare to similar function in main and refactor
+//todo compare to similar function in main and refactor
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {
 	std::string filename = std::string(path);

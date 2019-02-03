@@ -90,13 +90,14 @@
     <CustomBuildStep>
       <Command>XCOPY "$(SolutionDir)Shaders" "$(TargetDir)\Shaders\" /S /Y
 XCOPY "$(SolutionDir)Textures" "$(TargetDir)\Textures\" /S /Y
-XCOPY "$(SolutionDir)Dlls" "$(TargetDir)" /S /Y</Command>
+XCOPY "$(SolutionDir)Dlls" "$(TargetDir)" /S /Y
+XCOPY "$(SolutionDir)Models" "$(TargetDir)\Models\" /S /Y</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copying resources</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)Shaders;$(SolutionDir)Textures;$(SolutionDir)</Outputs>
+      <Outputs>$(SolutionDir)Shaders;$(SolutionDir)Textures;$(SolutionDir);$(SolutionDir)Models</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
