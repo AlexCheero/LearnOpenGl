@@ -21,7 +21,8 @@ void Model::LoadModel(std::string path)
 		return;
 	}
 
-	directory = path.substr(0, path.find_last_of('/'));
+	//todo make something with different slash in path
+	directory = path.substr(0, path.find_last_of("\\"));
 
 	ProcessNode(scene->mRootNode, scene);
 }
@@ -131,7 +132,7 @@ void Model::Draw(Shader shader)
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {
 	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
+	filename = directory + "\\" + filename;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
