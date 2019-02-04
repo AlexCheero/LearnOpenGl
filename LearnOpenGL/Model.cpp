@@ -46,7 +46,15 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 
-	//proc verts
+	ProcessVertices(mesh, vertices);
+	ProcessIndices(mesh, indices);
+	ProcessMaterials(mesh, scene, textures);
+
+	return Mesh(vertices, indices, textures);
+}
+
+void Model::ProcessVertices(aiMesh* mesh, std::vector<Vertex>& vertices)
+{
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
 		Vertex vertex;
@@ -68,8 +76,10 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
 		vertices.push_back(vertex);
 	}
+}
 
-	//proc inds
+void Model::ProcessIndices(aiMesh* mesh, std::vector<unsigned int>& indices)
+{
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
 		aiFace face = mesh->mFaces[i];
@@ -77,18 +87,18 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 	}
 
-	//proc mat
-	if (mesh->mMaterialIndex >= 0)
-	{
-		//todo remove hardcode
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-	}
+	int i;
+	i = 0;
+}
 
-	return Mesh(vertices, indices, textures);
+void Model::ProcessMaterials(aiMesh* mesh, const aiScene* scene, std::vector<Texture>& textures)
+{
+	//todo remove hardcode
+	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+	std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 }
 
 std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
