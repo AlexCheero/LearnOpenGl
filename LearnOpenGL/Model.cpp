@@ -83,7 +83,7 @@ void Model::ProcessIndices(aiMesh* mesh, std::vector<unsigned int>& indices)
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
 		aiFace face = mesh->mFaces[i];
-		for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
 
