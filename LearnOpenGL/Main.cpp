@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
 	//----------------------------------------
 	*/
 
-	Model model = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
+	Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -344,7 +344,26 @@ int main(int argc, char *argv[])
 						  , 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
 		//------------------------------------
 
-		model.Draw(objectShader);
+		objectShader.Use();
+		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
+		dirLight.Apply(objectShader, "dirLight");
+		for (int i = 0; i < pointLightsCount; ++i)
+			pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
+		spotLight.Apply(objectShader, "spotLight");
+		//------------Camera Transformations------------
+		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		//----------------------------------------------
+
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.75f, 0.0f));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f, 0.2f, 0.2f));
+		glm::mat4 modelView = view * modelMatrix;
+		glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
+		glm::mat3 normalMartix = glm::transpose(glm::inverse(view * modelMatrix));
+		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
+
+		nanosuitModel.Draw(objectShader);
 
 		/*
 //------------Draw Object------------

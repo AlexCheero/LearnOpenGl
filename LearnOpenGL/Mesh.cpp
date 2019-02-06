@@ -36,9 +36,9 @@ void Mesh::Draw(Shader shader)
 		std::string number;
 		std::string name = textures[i].type;
 		//hardcode!!!
-		if (name == "texture_diffuse")
+		if (name == "diffuse")
 			number = std::to_string(diffuseNr++);
-		else if (name == "texture_specular")
+		else if (name == "specular")
 			number = std::to_string(specularNr++);
 
 		//probably need to make set methods such as in learnopengl lessons
