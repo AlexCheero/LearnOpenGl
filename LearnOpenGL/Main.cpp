@@ -185,112 +185,6 @@ int main(int argc, char *argv[])
 	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
 	Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
-	std::vector<float> verticies =
-	{
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-	};
-
-	glm::vec3 cubePositions[] =
-	{
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
-	/*
-	//------------Object VAO------------
-	unsigned int VAO = PrepareVAO();
-	unsigned int VBO = PrepareBufferObject(verticies, GL_ARRAY_BUFFER);
-	unsigned int stride = 8 * sizeof(float);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	Unbind();
-	//----------------------------------
-
-	//------------Light VAO------------
-	unsigned int lightVAO = PrepareVAO();
-	// we only need to bind to the VBO, the container's VBO's data already contains the correct data.
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// set the vertex attributes (only position data for our lamp)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-	glEnableVertexAttribArray(0);
-	Unbind();
-	//---------------------------------
-
-	//-------------Textures stuff-------------
-	stbi_set_flip_vertically_on_load(true);
-
-	int diffuseMap = PrepareTexture("Textures\\container2.png", GL_REPEAT);
-	int specularMap = PrepareTexture("Textures\\container2_specular.png", GL_REPEAT);
-	//int emissionMap = PrepareTexture("Textures\\matrix.jpg", GL_REPEAT);
-
-	objectShader.Use();
-	//define what sampler corresponds to what texture
-	glUniform1i(objectShader.GetUniformLocation("material.diffuse"), 0);
-	glUniform1i(objectShader.GetUniformLocation("material.specular"), 1);
-	//glUniform1i(objectShader.GetUniformLocation("material.emission"), 2);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, diffuseMap);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specularMap);
-	//glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_2D, emissionMap);
-	//----------------------------------------
-	*/
-
 	Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
 
 	while (!glfwWindowShouldClose(window))
@@ -310,10 +204,11 @@ int main(int argc, char *argv[])
 		//Direction
 		glm::vec3 lightViewDir = glm::vec3(view * glm::vec4(glm::vec3(-0.2f, -1.0f, -0.3f), 0.0f));
 		Light dirLight(lightViewDir
-					 , glm::vec3(0.05f, 0.05f, 0.05f)
-					 , glm::vec3(0.4f, 0.4f, 0.4f)
+					 , glm::vec3(0.8f, 0.8f, 0.8f)
+					 , glm::vec3(1.0f, 1.0f, 1.0f)
 					 , glm::vec3(0.5f, 0.5f, 0.5f));
 
+		/*
 		//Point
 		glm::vec3 pointLightPositions[] =
 		{
@@ -322,6 +217,7 @@ int main(int argc, char *argv[])
 			glm::vec3(-4.0f,  2.0f, -12.0f),
 			glm::vec3(0.0f,  0.0f, -3.0f)
 		};
+
 		const int pointLightsCount = 4;
 		PointLight pointLights[pointLightsCount];
 		for (int i = 0; i < pointLightsCount; ++i)
@@ -334,6 +230,7 @@ int main(int argc, char *argv[])
 									  , 1.0f, 0.09f, 0.032f);
 		}
 
+		//Spot
 		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(mainCamera.GetPosition(), 1.0f));
 		glm::vec3 lightViewCamDir = glm::vec3(view * glm::vec4(mainCamera.Front(), 0.0f));
 		SpotLight spotLight(lightViewPos
@@ -342,15 +239,19 @@ int main(int argc, char *argv[])
 						  , glm::vec3(1.0f, 1.0f, 1.0f)
 						  , glm::vec3(1.0f, 1.0f, 1.0f)
 						  , 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
+		*/
 		//------------------------------------
+
 
 		objectShader.Use();
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 		dirLight.Apply(objectShader, "dirLight");
-		for (int i = 0; i < pointLightsCount; ++i)
-			pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
-		spotLight.Apply(objectShader, "spotLight");
+		//todo find out why i should comment out unnecessary light in both shader and cpp to switch it off
+		//for (int i = 0; i < pointLightsCount; ++i)
+		//	pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
+		//spotLight.Apply(objectShader, "spotLight");
+
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
@@ -364,59 +265,6 @@ int main(int argc, char *argv[])
 		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
 
 		nanosuitModel.Draw(objectShader);
-
-		/*
-//------------Draw Object------------
-		glBindVertexArray(VAO);
-		objectShader.Use();
-
-		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
-		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
-
-		dirLight.Apply(objectShader, "dirLight");
-		for (int i = 0; i < pointLightsCount; ++i)
-			pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
-		spotLight.Apply(objectShader, "spotLight");
-
-		//------------Camera Transformations------------
-		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//----------------------------------------------
-
-		for (int i = 0; i < 10; ++i)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-			glm::mat4 modelView = view * model;
-			glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
-
-			glm::mat3 normalMartix = glm::transpose(glm::inverse(view * model));
-			glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-//-----------------------------------
-
-//------------Draw Lamp------------
-		glBindVertexArray(lightVAO);
-		lampShader.Use();
-		//------------Camera Transformations------------
-		glUniformMatrix4fv(lampShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(lampShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//----------------------------------------------
-
-		for (int i = 0; i < pointLightsCount; ++i)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, pointLightPositions[i]);
-			model = glm::scale(model, glm::vec3(0.2f));
-			glUniformMatrix4fv(lampShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-//---------------------------------
-		*/
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
