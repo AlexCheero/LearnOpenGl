@@ -107,8 +107,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	
 	float distance = length(light.position - fragPos);
 	float attDenominator = (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-	attDenominator += 1 - step(0.000001, attDenominator);
-	float attenuation = 1.0 / attDenominator;
+	float attenuation = 1.0 / max(0.000001, attDenominator);
 	
 	return (ambient + diffuse + specular) * attenuation;
 }
@@ -132,7 +131,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	
 	float distance = length(light.position - fragPos);
 	float attDenominator = (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-	attDenominator += 1 - step(0.000001, attDenominator);
-	float attenuation = 1.0 / attDenominator;
+	float attenuation = 1.0 / max(0.000001, attDenominator);
+	
 	return (ambient + diffuse + specular) * attenuation;
 }
