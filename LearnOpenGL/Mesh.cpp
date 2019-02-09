@@ -42,6 +42,7 @@ void Mesh::Draw(Shader shader)
 			number = std::to_string(specularNr++);
 
 		//probably need to make set methods such as in learnopengl lessons
+		//this line seems unnecessary but it is in ogl lessons
 		glUniform1i(shader.GetUniformLocation(("material." + name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}

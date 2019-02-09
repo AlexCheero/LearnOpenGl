@@ -32,7 +32,7 @@ public:
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 
-	Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds, std::vector<Texture> txts) : vertices(verts), indices(inds), textures(txts)
+	Mesh(std::vector<Vertex>& verts, std::vector<unsigned int>& inds, std::vector<Texture>& txts) : vertices(verts), indices(inds), textures(txts)
 	{
 		SetupMesh();
 	}

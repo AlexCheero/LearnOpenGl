@@ -1,6 +1,5 @@
 #pragma once
 #include <glm/vec3.hpp>
-#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 enum class EMoveDirection
