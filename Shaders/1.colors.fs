@@ -69,9 +69,9 @@ void main()
 	vec3 viewDir = normalize(-FragPos);
 
 	vec3 result = CalcDirLight(dirLight, norm, viewDir);
-	//for (int i = 0; i < NR_POINT_LIGHTS; i++)
-	//	result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-	//result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
+	for (int i = 0; i < NR_POINT_LIGHTS; i++)
+		result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+	result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
 
     FragColor = vec4(result, 1.0);
 }
@@ -106,7 +106,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
 	
 	float distance = length(light.position - fragPos);
-	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+	float attDenominator = (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+	attDenominator += 1 - step(0.000001, attDenominator);
+	float attenuation = 1.0 / attDenominator;
 	
 	return (ambient + diffuse + specular) * attenuation;
 }
@@ -129,7 +131,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords)) * intencity;
 	
 	float distance = length(light.position - fragPos);
-	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-	
+	float attDenominator = (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+	attDenominator += 1 - step(0.000001, attDenominator);
+	float attenuation = 1.0 / attDenominator;
 	return (ambient + diffuse + specular) * attenuation;
 }

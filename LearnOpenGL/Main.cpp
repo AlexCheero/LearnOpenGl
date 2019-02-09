@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 		return -1;
 
 	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
-	Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
+	//Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
 	Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
 
@@ -200,58 +200,18 @@ int main(int argc, char *argv[])
 		glm::mat4 view = mainCamera.GetView();
 		glm::mat4 projection = mainCamera.GetProjection();
 
-		//-----------Light position-----------
-		//Direction
+		//Direction light
 		glm::vec3 lightViewDir = glm::vec3(view * glm::vec4(glm::vec3(-0.2f, -1.0f, -0.3f), 0.0f));
 		Light dirLight(lightViewDir
 					 , glm::vec3(0.8f, 0.8f, 0.8f)
 					 , glm::vec3(1.0f, 1.0f, 1.0f)
 					 , glm::vec3(0.5f, 0.5f, 0.5f));
 
-		/*
-		//Point
-		glm::vec3 pointLightPositions[] =
-		{
-			glm::vec3(0.7f,  0.2f,  2.0f),
-			glm::vec3(2.3f, -3.3f, -4.0f),
-			glm::vec3(-4.0f,  2.0f, -12.0f),
-			glm::vec3(0.0f,  0.0f, -3.0f)
-		};
-
-		const int pointLightsCount = 4;
-		PointLight pointLights[pointLightsCount];
-		for (int i = 0; i < pointLightsCount; ++i)
-		{
-			glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(pointLightPositions[i], 1.0f));
-			pointLights[i] = PointLight(lightViewPos
-									  , glm::vec3(0.8f, 0.8f, 0.8f)
-									  , glm::vec3(1.0f, 1.0f, 1.0f)
-									  , glm::vec3(0.5f, 0.5f, 0.5f)
-									  , 1.0f, 0.09f, 0.032f);
-		}
-
-		//Spot
-		glm::vec3 lightViewPos = glm::vec3(view * glm::vec4(mainCamera.GetPosition(), 1.0f));
-		glm::vec3 lightViewCamDir = glm::vec3(view * glm::vec4(mainCamera.Front(), 0.0f));
-		SpotLight spotLight(lightViewPos
-						  , lightViewCamDir
-						  , glm::vec3(0.0f, 0.0f, 0.0f)
-						  , glm::vec3(1.0f, 1.0f, 1.0f)
-						  , glm::vec3(1.0f, 1.0f, 1.0f)
-						  , 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
-		*/
-		//------------------------------------
-
-
 		objectShader.Use();
 		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 		dirLight.Apply(objectShader, "dirLight");
-		//todo find out why i should comment out unnecessary light in both shader and cpp to switch it off
-		//for (int i = 0; i < pointLightsCount; ++i)
-		//	pointLights[i].Apply(objectShader, std::string("pointLights[") + std::to_string(i) + ']');
-		//spotLight.Apply(objectShader, "spotLight");
-
+		
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
