@@ -47,6 +47,7 @@ struct SpotLight
 };
 
 uniform Material material;
+uniform samplerCube skybox;
 
 uniform DirLight dirLight;
 #define NR_POINT_LIGHTS 4
@@ -65,6 +66,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
+	/*
     vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(-FragPos);
 
@@ -74,6 +76,13 @@ void main()
 	result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
 
     FragColor = vec4(result, 1.0);
+    */
+
+    ///*
+    vec3 I = normalize(-FragPos);
+    vec3 R = reflect(I, normalize(Normal));
+    FragColor = vec4(texture(skybox, R).rgb, 1.0);
+    //*/
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)

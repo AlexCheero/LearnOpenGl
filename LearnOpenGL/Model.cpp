@@ -7,8 +7,6 @@
 
 #include "Log.h"
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
-
 //todo load obj file and textures from the different paths
 void Model::LoadModel(std::string path)
 {
