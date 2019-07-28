@@ -97,6 +97,9 @@ void Model::ProcessMaterials(aiMesh* mesh, const aiScene* scene, std::vector<Tex
 	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+	std::vector<Texture> reflectionMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "reflection");
+	textures.insert(textures.end(), reflectionMaps.begin(), reflectionMaps.end());
 }
 
 std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)

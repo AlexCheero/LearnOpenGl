@@ -30,6 +30,7 @@ void Mesh::Draw(Shader shader)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	unsigned int reflectionNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -40,12 +41,16 @@ void Mesh::Draw(Shader shader)
 			number = std::to_string(diffuseNr++);
 		else if (name == "specular")
 			number = std::to_string(specularNr++);
+		else if (name == "reflection")
+			number = std::to_string(reflectionNr++);
 
 		//probably need to make set methods such as in learnopengl lessons
 		//this line seems unnecessary but it is in ogl lessons
+		std::string str("material." + name);
 		glUniform1i(shader.GetUniformLocation(("material." + name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
+
 	glActiveTexture(GL_TEXTURE0);
 
 	//draw mesh

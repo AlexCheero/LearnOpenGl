@@ -211,7 +211,70 @@ int main(int argc, char *argv[])
 	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
 	//Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
-	Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
+	//Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
+	Model nanosuitModel = Model(exeRoot + "Models\\nanosuit_reflection\\nanosuit.obj");
+	// set up vertex data (and buffer(s)) and configure vertex attributes
+	// ------------------------------------------------------------------
+	float cubeVertices[] = {
+		// positions          // normals
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+
+	// cube VAO
+	unsigned int cubeVAO, cubeVBO;
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	Shader cubeReflective(exeRoot + "Shaders\\cubeRefl.vs", exeRoot + "Shaders\\cubeRefl.fs");
+	cubeReflective.Use();
+	glUniform1f(cubeReflective.GetUniformLocation("skybox"), 0);
 
 	//----Skybox----
 
@@ -286,8 +349,9 @@ int main(int argc, char *argv[])
 	skyboxShader.Use();
 	glUniform1i(skyboxShader.GetUniformLocation("skybox"), 0);
 
-	objectShader.Use();
-	glUniform1i(objectShader.GetUniformLocation("skybox"), 0);
+	/*glActiveTexture(GL_TEXTURE3);
+	glUniform1i(objectShader.GetUniformLocation("skybox"), 3);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);*/
 	//--------------
 
 	while (!glfwWindowShouldClose(window))
@@ -311,10 +375,10 @@ int main(int argc, char *argv[])
 					 , glm::vec3(0.5f, 0.5f, 0.5f));
 
 		objectShader.Use();
-		glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
+		//glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
 		dirLight.Apply(objectShader, "dirLight");
-		
+
 		//------------Camera Transformations------------
 		glUniformMatrix4fv(objectShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		//----------------------------------------------
@@ -322,13 +386,34 @@ int main(int argc, char *argv[])
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.75f, 0.0f));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f, 0.2f, 0.2f));
-		glm::mat4 modelView = view * modelMatrix;
-		glUniformMatrix4fv(objectShader.GetUniformLocation("modelView"), 1, GL_FALSE, glm::value_ptr(modelView));
+		//glm::mat4 modelView = view * modelMatrix;
+		glUniformMatrix4fv(objectShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		glUniformMatrix4fv(objectShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniform3fv(objectShader.GetUniformLocation("cameraPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
 		glm::mat3 normalMartix = glm::transpose(glm::inverse(view * modelMatrix));
 		glUniformMatrix3fv(objectShader.GetUniformLocation("normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMartix));
 
+		glActiveTexture(GL_TEXTURE4);
+		glUniform1i(objectShader.GetUniformLocation("skybox"), 4);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		nanosuitModel.Draw(objectShader);
 
+		/*
+		// draw scene as normal
+		cubeReflective.Use();
+		glm::mat4 model = glm::mat4(1.0f);
+
+		glUniformMatrix4fv(cubeReflective.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(cubeReflective.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(cubeReflective.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3fv(cubeReflective.GetUniformLocation("cameraPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
+		// cubes
+		glBindVertexArray(cubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		*/
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
