@@ -5,22 +5,27 @@
 
 #include "Log.h"
 
-Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath)
+Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath, const std::string& geometrySourcePath /*= ""*/)
 {
 	GLuint vertexShader = CreateShaderObjectFromFile(vertexSourcePath.c_str(), GL_VERTEX_SHADER);
 	GLuint fragmentShader = CreateShaderObjectFromFile(fragmentSourcePath.c_str(), GL_FRAGMENT_SHADER);
+	GLuint geometryShader = 0;
+	if (!geometrySourcePath.empty())
+		geometryShader = CreateShaderObjectFromFile(geometrySourcePath.c_str(), GL_GEOMETRY_SHADER);;
 
-	CreateShaderProgram(vertexShader, fragmentShader);
+	CreateShaderProgram(vertexShader, fragmentShader, geometryShader);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
 
-void Shader::CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader)
+void Shader::CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader)
 {
 	_shaderProgram = glCreateProgram();
 	glAttachShader(_shaderProgram, vertexShader);
 	glAttachShader(_shaderProgram, fragmentShader);
+	if (geometryShader != 0)
+		glAttachShader(_shaderProgram, geometryShader);
 	glLinkProgram(_shaderProgram);
 
 	GLint success;

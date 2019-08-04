@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
 	if (!Init(argv[0]))
 		return -1;
 
-	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs");
+	Shader objectShader(exeRoot + "Shaders\\1.colors.vs", exeRoot + "Shaders\\1.colors.fs", exeRoot + "Shaders\\PassThrough.gs");
 	//Shader lampShader(exeRoot + "Shaders\\1.lamp.vs", exeRoot + "Shaders\\1.lamp.fs");
 
 	//Model nanosuitModel = Model(exeRoot + "Models\\nanosuit\\nanosuit.obj");
@@ -271,10 +271,6 @@ int main(int argc, char *argv[])
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	Shader cubeReflective(exeRoot + "Shaders\\cubeRefl.vs", exeRoot + "Shaders\\cubeRefl.fs");
-	cubeReflective.Use();
-	glUniform1f(cubeReflective.GetUniformLocation("skybox"), 0);
 
 	//----Skybox----
 
@@ -349,9 +345,6 @@ int main(int argc, char *argv[])
 	skyboxShader.Use();
 	glUniform1i(skyboxShader.GetUniformLocation("skybox"), 0);
 
-	/*glActiveTexture(GL_TEXTURE3);
-	glUniform1i(objectShader.GetUniformLocation("skybox"), 3);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);*/
 	//--------------
 
 	while (!glfwWindowShouldClose(window))
@@ -397,23 +390,6 @@ int main(int argc, char *argv[])
 		glUniform1i(objectShader.GetUniformLocation("skybox"), 4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		nanosuitModel.Draw(objectShader);
-
-		/*
-		// draw scene as normal
-		cubeReflective.Use();
-		glm::mat4 model = glm::mat4(1.0f);
-
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(cubeReflective.GetUniformLocation("cameraPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
-		// cubes
-		glBindVertexArray(cubeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		*/
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content

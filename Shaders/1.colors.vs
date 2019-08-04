@@ -3,10 +3,15 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoords;
-out vec3 Position;
+out vec3 vFragPos;
+out vec3 vNormal;
+out vec2 vTexCoords;
+
+/*
+out vec3 fFragPos;
+out vec3 fNormal;
+out vec2 fTexCoords;
+*/
 
 uniform mat4 model;
 uniform mat4 view;
@@ -16,9 +21,15 @@ uniform vec3 lightPos;
 
 void main()
 {
-	FragPos = vec3(view * model * vec4(aPos, 1.0));
-	Position = vec3(model * vec4(aPos, 1.0));
-	gl_Position = projection * vec4(FragPos, 1.0);
-	Normal = normalMatrix * aNormal;
-	TexCoords = aTexCoords;
+	vFragPos = vec3(view * model * vec4(aPos, 1.0));
+	vNormal = normalMatrix * aNormal;
+	vTexCoords = aTexCoords;
+	gl_Position = projection * vec4(vFragPos, 1.0);
+
+	/*
+	fFragPos = vec3(view * model * vec4(aPos, 1.0));
+	fNormal = normalMatrix * aNormal;
+	fTexCoords = aTexCoords;
+	gl_Position = projection * vec4(fFragPos, 1.0);
+	*/
 }
