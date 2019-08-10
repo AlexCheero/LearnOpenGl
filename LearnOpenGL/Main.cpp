@@ -347,6 +347,8 @@ int main(int argc, char *argv[])
 
 	//--------------
 
+	Shader normalsShader(exeRoot + "Shaders\\normals.vs", exeRoot + "Shaders\\normals.fs", exeRoot + "Shaders\\normals.gs");
+
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -389,7 +391,16 @@ int main(int argc, char *argv[])
 		glActiveTexture(GL_TEXTURE4);
 		glUniform1i(objectShader.GetUniformLocation("skybox"), 4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+		glUniform1f(objectShader.GetUniformLocation("time"), /*currentFrame*/-1);
+
 		nanosuitModel.Draw(objectShader);
+
+		normalsShader.Use();
+		glUniformMatrix4fv(normalsShader.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(normalsShader.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		glUniformMatrix4fv(normalsShader.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+		nanosuitModel.Draw(normalsShader);
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -404,7 +415,6 @@ int main(int argc, char *argv[])
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
