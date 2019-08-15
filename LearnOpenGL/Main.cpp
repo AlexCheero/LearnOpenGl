@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
 
 		objectShader.Use();
 		//glUniform3f(objectShader.GetUniformLocation("material.specular"), 0.5f, 0.5f, 0.5f);
-		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 32.0f);
+		glUniform1f(objectShader.GetUniformLocation("material.shininess"), 128.0f);
 		dirLight.Apply(objectShader, "dirLight");
 
 		//------------Camera Transformations------------
@@ -397,23 +397,6 @@ int main(int argc, char *argv[])
 		glUniform1i(objectShader.GetUniformLocation("skybox"), 4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		nanosuitModel.Draw(objectShader);
-
-		/*
-		// draw scene as normal
-		cubeReflective.Use();
-		glm::mat4 model = glm::mat4(1.0f);
-
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(cubeReflective.GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(cubeReflective.GetUniformLocation("cameraPos"), 1, glm::value_ptr(mainCamera.GetPosition()));
-		// cubes
-		glBindVertexArray(cubeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		*/
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
